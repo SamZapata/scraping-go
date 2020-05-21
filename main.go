@@ -6,11 +6,13 @@ import (
   "github.com/valyala/fasthttp"
   "github.com/buaazp/fasthttprouter"
   "encoding/json"
-  // "html/template"
+  "html/template"
   "github.com/likexian/whois-go"
   "github.com/likexian/whois-parser-go"
   "github.com/PuerkitoBio/goquery"
   "strings"
+  "database/sql"
+  _ "github.com/lib/pq"
 )
 
 const Port = ":8080"
@@ -20,15 +22,20 @@ func main() {
   // server connection router with fasthttprouter
   router := fasthttprouter.New()
   // endpoint I
-  router.GET("/api/servers/v1/d/:domain", ServerFasthttp)
+  path_fetch_domain := "/api/servers/v1/d/:domain"
+  router.GET(path_fetch_domain, GetServerInformation)
+  // endpoint II
+  path_domains := "/api/servers/v1/domains"
+  router.GET(path_domains, GetServers)
 
   log.Fatal(fasthttp.ListenAndServe(Port, router.Handler))
 }
 // fasthttp request handler
-func ServerFasthttp(ctx *fasthttp.RequestCtx) {
+func GetServerInformation(ctx *fasthttp.RequestCtx) {
   // fetch data of server with the given domain
   j := FetchServerData(ctx.UserValue("domain"))
   fmt.Fprintf(ctx, j)
+  SaveDomain(ctx.UserValue("domain"))
 }
 
 // Build server
@@ -226,4 +233,62 @@ func DoRequestResponse(url string) interface{} {
 	body := res.Body()
   fmt.Println("successful response!")
   return string(body)
+}
+
+// save domains in the 'dataservers' database
+func SaveDomain(domain interface{})  {
+  db, err := ConnectDB()
+  WriteDB(db, err, domain.(string))
+}
+
+// connect to the databse Cockroach
+func ConnectDB() (*sql.DB, interface{}) {
+  db, err := sql.Open("postgres", "postgresql://jsam@localhost:26257/dataservers?ssl=true&sslmode=require&sslrootcert=certs/ca.crt&sslkey=certs/client.jsam.key&sslcert=certs/client.jsam.crt")
+  if err != nil {
+    log.Fatal("Error connecting to the database:", err)
+  }
+  // defer db.Close()
+  return db, err
+}
+
+func WriteDB(db *sql.DB, err interface{}, d string )  {
+  // create/verify the table 'domains'
+  if _, err := db.Exec("CREATE TABLE IF NOT EXISTS domains (id INT PRIMARY KEY DEFAULT unique_rowid(), domain STRING NOT NULL, search_date TIMESTAMP)"); err != nil {
+    log.Fatal(err)
+  }
+
+  // insert elements into 'domains'
+  if _, err := db.Exec("INSERT INTO domains (domain, search_date) VALUES ($1, now())", d); err != nil {
+    log.Fatal(err)
+  }
+}
+
+// Get servers - Endpoint II
+func GetServers(ctx *fasthttp.RequestCtx) {
+  fmt.Println("i'm the endpoint ii")
+  type Domain struct {
+    Items []string  `json:"items"`
+  }
+
+  db, err := ConnectDB()
+  rows, err := db.Query("SELECT domain FROM domains")
+  if err != nil {
+      log.Fatal(err)
+  }
+  var d Domain
+  dd := ""
+  for rows.Next() {
+    var dom string
+    if err := rows.Scan(&dom); err != nil {
+      log.Fatal(err)
+    }
+    if dd != dom {
+      d.Items = append(d.Items, dom)
+    }
+    dd = dom
+  }
+  j, _ := json.Marshal(d)
+  fmt.Println(d)
+  fmt.Println(string(j))
+  fmt.Fprintf(ctx, string(j))
 }
