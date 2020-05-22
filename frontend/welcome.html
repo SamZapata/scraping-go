@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Scrapping GO!</title>
+    <link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap/dist/css/bootstrap.min.css"/>
+    <link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.min.css"/>
+    <script src="https://unpkg.com/vue/dist/vue.min.js"> </script>
+    <script src="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.min.js"></script>
+  </head>
+  <body>
+    <section class="p-3 mb-2 bg-info text-white">
+      <div class="container">
+        <div id="app" class="mw-100 h-100 d-inline-block mt-5 text-center ">
+          <span v-bind:title="message">
+            <h1>Welcome!</h1>
+             <h3>Enter a domain and you will know some stuff about it</h3>
+          </span>
+        </div>
+      </div>
+    </section>
+    <div class="container">
+      <a href="/api/servers/v1/d=truora.com" class="btn btn-secondary btn-lg" tabindex="-1" role="button" aria-disabled="false">Search</a>
+      <a href="/api/servers/v1/domains" class="btn btn-primary btn-lg" tabindex="-1" role="button" aria-disabled="false">Domain List</a>
+
+      <form class="mt-3">
+        <input type="text" name="/api/servers/v1/d=" v-model="sgd">
+        <button type="submit" >Submit</button>
+      </form>
+    </div>
+
+    <!-- scripts -->
+    <!-- <script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script> -->
+  </body>
+</html>
+<script type="text/javascript">
+  var app = new Vue({
+    el: '#app',
+    data: {
+      message: 'Hello Johnnyman with Vue.js!'
+    }
+  })
+
+  Vue.component('todo-item', {
+    props: ['todo'],
+    template: '<li>{ todo.text }</li>'
+  })
+
+
+  var Comp = Vue.extend()
+  // export default {
+  //   data(){
+  //     return {
+  //       foobarre : null
+  //     }
+  //   },
+  //   methods: {
+  //     submit(){
+  //        //if you want to send any data into server before redirection then you can do it here
+  //       this.$router.push("/api/servers/v1/d="+this.foobar);
+  //     }
+  //   }
+  // }
+</script>

@@ -21,8 +21,11 @@ func main() {
   fmt.Println("created by @samzapata")
   // server connection router with fasthttprouter
   router := fasthttprouter.New()
+  // load welcome index
+  path_index := "/"
+  router.GET(path_index, Index)
   // endpoint I
-  path_fetch_domain := "/api/servers/v1/d/:domain"
+  path_fetch_domain := "/api/servers/v1/d=:domain"
   router.GET(path_fetch_domain, GetServerInformation)
   // endpoint II
   path_domains := "/api/servers/v1/domains"
@@ -290,5 +293,14 @@ func GetServers(ctx *fasthttp.RequestCtx) {
   j, _ := json.Marshal(d)
   fmt.Println(d)
   fmt.Println(string(j))
+
   fmt.Fprintf(ctx, string(j))
+}
+
+func Index(ctx *fasthttp.RequestCtx)  {
+  // render welcome!
+  ctx.SetContentType("text/html")
+  // tmpl := template.Must(template.ParseGlob("welcome.html"))
+  tmpl := template.Must(template.ParseFiles("frontend/welcome.html"))
+  tmpl.Execute(ctx, nil)
 }

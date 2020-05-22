@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Scrapping GO!</title>
+    <link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap/dist/css/bootstrap.min.css"/>
+    <link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.min.css"/>
+    <script src="https://unpkg.com/vue/dist/vue.min.js"> </script>
+    <script src="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.min.js"></script>
+  </head>
+  <body>
+    <section>
+      <span class="text-center">
+        <h1>WELCOME</h1>
+        <h3>Enter a domain to get information about it!</h3>
+      </span>
+      <form id="app" @submit="checkForm" action="/api/servers/v1/d=" method="post">
+        <p v-if="errors.length">
+          <b>Please correct the following error(s):</b>
+          <ul>
+            <li v-for="error in errors">{ error }</li>
+          </ul>
+        </p>
+
+        <p>
+          <label for="name">Name<label>
+          <input type="text" name="name" id="name" v-model="name">
+        </p>
+
+        <p>
+          <label for="age">Age<label>
+          <input type="number" name="age" id="age" v-model="age" min="0">
+        </p>
+
+        <p>
+          <label for="movie">Favorite Movie<label>
+          <select name="movie" id="movie" v-model="movie">
+            <option>Star Wars</option>
+            <option>Vanilla Sky</option>
+            <option>Atomic Blonde</option>
+          </select>
+        </p>
+
+        <p>
+          <input type="submit" value="Submit">
+        </p>
+
+      </form>
+
+    </section>
+    <template>
+
+    </template>
+
+    <!-- scripts -->
+    <!-- <script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script> -->
+  </body>
+</html>
+<script type="text/javascript">
+  var app1 = new Vue({
+    el: '#app1',
+    data: {
+      message: 'Hello Johnnyman with Vue.js!'
+    }
+  })
+
+  const app = new Vue({
+    el:'#app',
+    data:{
+      errors:[],
+      name:null,
+      age:null,
+      movie:null
+    },
+    methods:{
+      checkForm:function(e) {
+        if(this.name && this.age) return true;
+        this.errors = [];
+        if(!this.name) this.errors.push("Name required.");
+        if(!this.age) this.errors.push("Age required.");
+        this.$router.push("/api/servers/v1/d="+this.foobar);
+        e.preventDefault();
+      }
+    }
+  })
+
+  // export default {
+  //   data(){
+  //     return {
+  //       foobar : null
+  //     }
+  //   },
+  //   methods: {
+  //     submit(){
+  //        //if you want to send any data into server before redirection then you can do it here
+  //       this.$router.push("/api/servers/v1/d="+this.foobar);
+  //     }
+  //   }
+  // }
+</script>
